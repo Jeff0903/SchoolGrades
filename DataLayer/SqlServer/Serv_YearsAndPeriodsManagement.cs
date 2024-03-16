@@ -1,4 +1,5 @@
-﻿using SchoolGrades.BusinessObjects;
+﻿using NUnit.Framework.Constraints;
+using SchoolGrades.BusinessObjects;
 using System;
 using System.Data.Common;
 
@@ -22,7 +23,7 @@ namespace SchoolGrades
 
     internal partial class SqlServer_DataLayer : DataLayer
     {
-        internal override void CreateTableSchoolYears()  //crea una nuova tabella
+        internal override void CreateTableSchoolYears()
         {
             try
             {
@@ -43,7 +44,7 @@ namespace SchoolGrades
 
             }
         }
-        internal override bool SchoolYearExists(string idSchoolYear)  //guarda cosa c'è nella tabella
+        internal override bool SchoolYearExists(string idSchoolYear)
         {
             using (DbConnection conn = Connect())
             {
@@ -54,11 +55,9 @@ namespace SchoolGrades
                     ";";
                 var result = cmd.ExecuteScalar();
                 return (result != null);
-
-
             }
         }
-        internal override void AddSchoolYear(SchoolYear newSchoolYear)  //aggiunge i valori all'interno della tabella
+        internal override void AddSchoolYear(SchoolYear newSchoolYear)
         {
             using (DbConnection conn = Connect())
             {
@@ -74,14 +73,6 @@ namespace SchoolGrades
                 cmd.Dispose();
             }
         }
-        internal override void DeleteSchoolYear(string year)  //cancella i dati di una tabella
-        {   // query funzionante:  delete from SchoolYears where idSchoolYear = '27-28' ;
-            using (DbConnection conn = Connect())
-            {
-                DbCommand cmd = conn.CreateCommand();
-                cmd.CommandText = "DELETE FROM SchoolYears WHERE IdSchoolYear = '" + year + "';";
-                var result = cmd.ExecuteNonQuery();
-            }
-        }
+   
     }
 }

@@ -41,24 +41,24 @@ namespace gamon.TreeMptt
         // https://www.sitepoint.com/hierarchical-data-database/, by Gijs Van Tulder
 
         // class that encapsulates the data access to the tree nodes 
-        TreeMpttDb dbMptt;
+        TreeMpttDb_SqLite dbMptt;
 
-        internal bool hasChanges = false;
+        private bool hasChanges = false;
         bool markAllInSearch = false;
-        internal bool putCheckSignsOnNodes;
+        private bool putCheckSignsOnNodes;
 
         BusinessLayer bl = Commons.bl;
 
-        //internal object value;
-        //internal Image globalPicLed;
-        //internal CheckBox chkSearchInDescriptions;
-        //internal CheckBox chkVerbatimString;
-        //internal CheckBox chkAllWord;
-        //internal CheckBox chkCaseInsensitive;
-        //internal CheckBox chkMarkAllNodesFound;
-        //internal DragDropEffects copy;
+        //private object value;
+        //private Image globalPicLed;
+        //private CheckBox chkSearchInDescriptions;
+        //private CheckBox chkVerbatimString;
+        //private CheckBox chkAllWord;
+        //private CheckBox chkCaseInsensitive;
+        //private CheckBox chkMarkAllNodesFound;
+        //private DragDropEffects copy;
 
-        //internal TreeMptt(TextBox trwTopics, TextBox txtTopicName, TextBox txtTopicDescription, TextBox txtTopicSearchString, TextBox txtTopicsDigest, object value, Image globalPicLed, CheckBox chkSearchInDescriptions, CheckBox chkVerbatimString, CheckBox chkAllWord, CheckBox chkCaseInsensitive, CheckBox chkMarkAllNodesFound, DragDropEffects copy)
+        //public TreeMptt(TextBox trwTopics, TextBox txtTopicName, TextBox txtTopicDescription, TextBox txtTopicSearchString, TextBox txtTopicsDigest, object value, Image globalPicLed, CheckBox chkSearchInDescriptions, CheckBox chkVerbatimString, CheckBox chkAllWord, CheckBox chkCaseInsensitive, CheckBox chkMarkAllNodesFound, DragDropEffects copy)
         //{
         //    this.trwTopics = trwTopics;
         //    this.txtTopicSearchString = txtTopicSearchString;
@@ -75,16 +75,16 @@ namespace gamon.TreeMptt
 
         #region fields used for drag and drop 
         // identification of the Treeview control from which the drag starts
-        internal int dragSourceControlHash;
-        internal bool hasNodeBeenSelectedFromTree = false;
+        private int dragSourceControlHash;
+        private bool hasNodeBeenSelectedFromTree = false;
 
-        internal Topic currentTopic = null;
+        private Topic currentTopic = null;
 
         System.Windows.DragDropEffects typeOfDragAndDrop;
         #endregion
 
         #region fields used for saving the Mptt tree (also concurrently)
-        internal static bool isSavingTreeMptt;
+        private static bool isSavingTreeMptt;
 
         #endregion
 
@@ -103,7 +103,7 @@ namespace gamon.TreeMptt
 
         #region internal object variables for controls passed from outside
         // Winforms control that is manipulated by this class
-        internal TreeView shownTreeView;
+        private TreeView shownTreeView;
         TextBox txtNodeName;
         TextBox txtNodeDescription;
         TextBox txtSearchString;
@@ -118,21 +118,21 @@ namespace gamon.TreeMptt
         #endregion
 
         #region coloring of the nodes
-        internal Brush colorOfHighlightedItem = Brushes.Khaki;
-        internal Brush colorOfFoundItem = Brushes.Lime;
-        internal Brush colorOfBeheadedColor = Brushes.Orange;
+        private Brush colorOfHighlightedItem = Brushes.Khaki;
+        private Brush colorOfFoundItem = Brushes.Lime;
+        private Brush colorOfBeheadedColor = Brushes.Orange;
         #endregion
 
         // if true the backcolor of nodes will be cleared when the user clicks on one node 
         bool clearBackColorOnClick = true;
-        internal bool ClearBackColorOnClick { get => clearBackColorOnClick; set => clearBackColorOnClick = value; }
+        public bool ClearBackColorOnClick { get => clearBackColorOnClick; set => clearBackColorOnClick = value; }
         // Name of the object
-        internal string Name { get; set; }
+        public string Name { get; set; }
         // TreeView control from the calling code
-        internal TreeView TreeView { get => shownTreeView; }
+        public TreeView TreeView { get => shownTreeView; }
 
         bool functionKeysEnabled = true;
-        internal bool FunctionKeysEnabled
+        public bool FunctionKeysEnabled
         {
             get
             {
@@ -192,7 +192,7 @@ namespace gamon.TreeMptt
                 functionKeysEnabled = value;
             }
         }
-        internal bool HasChanges { get => hasChanges; set => hasChanges = value; }
+        public bool HasChanges { get => hasChanges; set => hasChanges = value; }
         internal TreeMptt(TreeView TreeViewControl,
             TextBox TxtNodeName, TextBox TxtNodeDescription, TextBox TxtNodeSearchString,
             TextBox TxtNodeDigest, TextBox TxtIdNode,
@@ -202,9 +202,11 @@ namespace gamon.TreeMptt
             bool PutCheckSignsOnNodes = true)
         {
             bl = Commons.bl;
-
-            dbMptt = TreeMptt.SetDataLayer();
-
+#if SQL_SERVER
+            TreeMpttDb_SqlServer dbMptt = new TreeMpttDb_SqLite();
+#else
+            TreeMpttDb_SqLite dbMptt = new TreeMpttDb_SqLite();
+#endif
             shownTreeView = TreeViewControl;
             //listTopicsBefore = InitialListOfTopics;
             txtNodeName = TxtNodeName;
@@ -238,14 +240,6 @@ namespace gamon.TreeMptt
             }
             typeOfDragAndDrop = TypeOfDragAndDrop;
             putCheckSignsOnNodes = PutCheckSignsOnNodes;
-        }
-        internal static TreeMpttDb? SetDataLayer()
-        {
-#if SQL_SERVER
-            return new TreeMpttDb_SqlServer(Commons.bl.dl);
-#else
-            return new TreeMpttDb_SqLite(Commons.bl.dl);
-#endif
         }
         #region methods that save the tree
         internal void SaveTreeFromScratch()
@@ -489,7 +483,7 @@ namespace gamon.TreeMptt
                 (InitialNode.LeftNodeOld, InitialNode.RightNodeOld, false);
             return tree;
         }
-        internal void ImportSubtreeFromText(string TextFromClipboard)
+        public void ImportSubtreeFromText(string TextFromClipboard)
         {
             if (TextFromClipboard == "")
             {
@@ -626,7 +620,7 @@ namespace gamon.TreeMptt
             }
             return f;
         }
-        internal TreeViewItem FindNodeById_Recursive(TreeViewItem TreeViewItem, Topic Topic)
+        private TreeViewItem FindNodeById_Recursive(TreeViewItem TreeViewItem, Topic Topic)
         {
             if (!Commons.ProcessingCanContinue())
             {
@@ -670,7 +664,7 @@ namespace gamon.TreeMptt
                 ColorAllBeheadedNodes_Recursive(n);
             }
         }
-        internal void ColorAllBeheadedNodes_Recursive(TreeViewItem TreeViewItem)
+        private void ColorAllBeheadedNodes_Recursive(TreeViewItem TreeViewItem)
         {
             foreach (TreeViewItem tn in TreeViewItem.Items)
             {
@@ -804,7 +798,7 @@ namespace gamon.TreeMptt
                 ClearBackColor_Recursive(n);
             }
         }
-        internal void ClearBackColor_Recursive(TreeViewItem TreeViewItem)
+        private void ClearBackColor_Recursive(TreeViewItem TreeViewItem)
         {
             // called by ClearBackColor function
             foreach (TreeViewItem tn in TreeViewItem.Items)
@@ -1011,7 +1005,7 @@ namespace gamon.TreeMptt
             //////////}
             //////////hasChanges = true;
         }
-        internal string GetStringOfJustSomeNodesOfPath(string Path)
+        private string GetStringOfJustSomeNodesOfPath(string Path)
         {
             if (Path == null)
                 return null;
@@ -1025,13 +1019,13 @@ namespace gamon.TreeMptt
             return stringToAdd += ". ";
         }
         #region events
-        internal void txtNodeDescription_LostFocus(object sender, RoutedEventArgs e)
+        private void txtNodeDescription_LostFocus(object sender, RoutedEventArgs e)
         {
             if (currentTopic == null) return;
             if (((TextBox)sender).Text != currentTopic.Desc)
                 hasChanges = true;
         }
-        internal void txtNodeName_LostFocus(object sender, RoutedEventArgs e)
+        private void txtNodeName_LostFocus(object sender, RoutedEventArgs e)
         {
             if (currentTopic == null) return;
             if (((TextBox)sender).Text != currentTopic.Name)
@@ -1074,7 +1068,7 @@ namespace gamon.TreeMptt
             ////////dragSourceControlHash = e.Item.GetHashCode();
             ////////shownTreeView.DoDragDrop(e.Item, typeOfDragAndDrop);
         }
-        internal void TreeView_DragLeave(object sender, RoutedEventArgs e)
+        private void TreeView_DragLeave(object sender, RoutedEventArgs e)
         {
             // feedback to user 
         }
@@ -1209,7 +1203,7 @@ namespace gamon.TreeMptt
             if (ClearBackColorOnClick)
                 ClearBackColor();
         }
-        internal void TxtNodeName_Leave(object sender, RoutedEventArgs e)
+        private void TxtNodeName_Leave(object sender, RoutedEventArgs e)
         {
             if (TreeView.SelectedItem != null)
             {
@@ -1231,7 +1225,7 @@ namespace gamon.TreeMptt
             }
         }
         string previousText = "";
-        internal void TxtNodeName_TextChanged(object sender, RoutedEventArgs e)
+        private void TxtNodeName_TextChanged(object sender, RoutedEventArgs e)
         {
             // if the change is due to selection in the tree, don't change
             if (hasNodeBeenSelectedFromTree)
@@ -1286,7 +1280,7 @@ namespace gamon.TreeMptt
                 }
             }
         }
-        internal void TxtNodeDescription_Leave(object sender, RoutedEventArgs e)
+        private void TxtNodeDescription_Leave(object sender, RoutedEventArgs e)
         {
             if (hasNodeBeenSelectedFromTree)
                 return;
@@ -1366,7 +1360,7 @@ namespace gamon.TreeMptt
             // deleting previousSearch the next search will be done from scratch 
             previousSearch = "";
         }
-        internal void SearchCheckBoxes_CheckedChanged(object sender, RoutedEventArgs e)
+        private void SearchCheckBoxes_CheckedChanged(object sender, RoutedEventArgs e)
         {
             // event fired when any of the checkboxes related to search is changed 
 
@@ -1374,12 +1368,12 @@ namespace gamon.TreeMptt
             ResetSearch();
             FindNodes(txtSearchString.Text);
         }
-        internal void chkMarkAllTopicsFound_CheckedChanged(object sender, RoutedEventArgs e)
+        private void chkMarkAllTopicsFound_CheckedChanged(object sender, RoutedEventArgs e)
         {
             // command a new search for the next search 
             ResetSearch();
         }
-        internal void chkVerbatimString_CheckedChanged(object sender, RoutedEventArgs e)
+        private void chkVerbatimString_CheckedChanged(object sender, RoutedEventArgs e)
         {
             // command a new search for the next search 
             ResetSearch();
@@ -1388,7 +1382,7 @@ namespace gamon.TreeMptt
         {
             GetChildren_Recursive(ParentNode, Level);
         }
-        internal void GetChildren_Recursive(TreeViewItem ParentNode, int Level)
+        private void GetChildren_Recursive(TreeViewItem ParentNode, int Level)
         {
             // connection can come from outside to avoid opening and closing it every time 
             // if it is null, the connection must be opened locally 
@@ -1473,7 +1467,7 @@ namespace gamon.TreeMptt
             // right node management
             CurrentNode.RightNodeNew = nodeCount++;
         }
-        internal TreeViewItem CreateTreeViewItem(Topic Node)
+        private TreeViewItem CreateTreeViewItem(Topic Node)
         {
             TreeViewItem item = new TreeViewItem();
             // Create a new StackPanel for text and checkbox 
@@ -1496,7 +1490,7 @@ namespace gamon.TreeMptt
             item.Tag = Node;
             return item;
         }
-        internal void ExportSubtreeToClipboard()
+        public void ExportSubtreeToClipboard()
         {
             TreeViewItem item = (TreeViewItem)(shownTreeView.SelectedItem);
             if (item.Tag == null)

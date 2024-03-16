@@ -18,5 +18,20 @@ namespace SchoolGrades
             }
             return r;
         }
+        internal override void CreateTableGF()
+        {
+            using (DbConnection conn = Connect())
+            {
+                DbCommand cmd = conn.CreateCommand();
+                cmd = conn.CreateCommand();
+                cmd.CommandText = "CREATE TABLE GeneralFunctions " +
+                    "\r\n(idFunction VARCHAR(5) NOT NULL," +
+                    "\r\n shortDesc VARCHAR(10) NULL," +
+                    "\r\nnotes VARCHAR(255) NULL," +
+                    "\r\nPRIMARY KEY(idFunction)) ";
+                cmd.ExecuteNonQuery();
+       
+            }
+        }
     }
 }

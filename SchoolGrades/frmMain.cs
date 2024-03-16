@@ -125,7 +125,7 @@ namespace SchoolGrades
                         // the configured file exists, if it is a file for a single class,
                         // check if a more recent file exists and ask the user if she wants to
                         // pass to the new file 
-                        DateTime fileDateInName = Commons.GetValidDateFromString(configuredFileName.Substring(0, 19));
+                        DateTime fileDateInName = Commons.GetValidDateFromString(configuredFileName.Substring(0, 10));
                         if (fileDateInName != DateTime.MinValue)
                         {
                             // we found the class database with fileDate in the beginning of the name
@@ -142,7 +142,6 @@ namespace SchoolGrades
                                     == DialogResult.Yes)
                                 {
                                     Commons.PathAndFileDatabase = newestFileName;
-                                    CreateBusinessLayer();
                                     Commons.bl.WriteConfigData();
                                     MessageBox.Show("File di configurazione salvato in " + Commons.PathAndFileConfig);
                                 }
@@ -153,12 +152,11 @@ namespace SchoolGrades
                 }
             }
 #endif
-            CreateBusinessLayer();
 
-            // remove the next cinditioned compilation when the SQL server program is funcioning
+            CreateBusinessLayer();
 #if !SQL_SERVER
             Commons.bl.GetSchoolYearsThatHaveClasses();
-            // da togliere dopo che il DataLayer SQL server funziona
+            // da togliere dopo che DataLayer SQL server funziona
             List<SchoolYear> ly = Commons.bl.GetSchoolYearsThatHaveClasses();
             cmbSchoolYear.DataSource = ly;
             if (ly.Count > 0)
@@ -231,8 +229,8 @@ namespace SchoolGrades
             btnTemporary.Visible = false;
 #endif
 
-            CreateBusinessLayer();
-            // da togliere dopo che il DataLayer di SQL server funziona
+            CreateBusinessLayer(); 
+            // da togliere dopo che DataLayer SQL server funziona
 #if !SQL_SERVER
             school = Commons.bl.GetSchool(Commons.IdSchool);
             if (school == null)
@@ -293,11 +291,33 @@ namespace SchoolGrades
                 return proposedDemoDatabaseFile;
             }
             // look for the newest "ISO date at left" filename in folder
+            newDatabaseFileName = GetNewestAmongFilesWithDateInName(proposedDatabasePath);
+            //newDatabaseFileName = Commons.bl.GetNewestAmongFilesWithDateInName(proposedDatabasePath);
             newDatabaseFileName = Commons.GetNewestAmongFilesWithDateInName(proposedDatabasePath);
             if (newDatabaseFileName != "")
                 return newDatabaseFileName;
             else
                 return "";
+        }
+        private string GetNewestAmongFilesWithDateInName(string DatabasePath)
+        {
+            if (!Directory.Exists(DatabasePath))
+            {
+                return null;
+            }
+            string[] files = Directory.GetFiles(DatabasePath);
+            DateTime newestFileDate = DateTime.MinValue;
+            string newestFileNameAndPath = "";
+            foreach (string file in files)
+            {
+                DateTime thisFileDate = Commons.GetValidDateFromString(Path.GetFileName(file).Substring(0, 10));
+                if (thisFileDate > newestFileDate)
+                {
+                    newestFileDate = thisFileDate;
+                    newestFileNameAndPath = file;
+                }
+            }
+            return newestFileNameAndPath;
         }
         private bool CreateBusinessLayer()
         {

@@ -166,7 +166,9 @@ namespace SchoolGrades
                     SqlString(Student.Origin) + "," +
                     SqlString(Student.Email) + "," +
                     SqlDate(Student.BirthDate.ToString()) + "," +
-                    SqlString(Student.BirthPlace) + "," + "0," + "0" +
+                    SqlString(Student.BirthPlace) + "," +
+                    "false," +
+                    "false" +
                     ");";
                 cmd.ExecuteNonQuery();
                 cmd.Dispose();
@@ -580,31 +582,6 @@ namespace SchoolGrades
                 }
                 cmd.ExecuteNonQuery();
                 cmd.Dispose();
-            }
-        }
-        //TO DO!!!! CHANGE THE LAST TWO PARAMETERS FROM INT TO BOOLEAN
-        internal override void CreateTableStudents() //create the table student using this method and then try it on nunit adding new parameters to try 
-        {
-            //from the sql file given from Monti Search your table (mine is "Student") and then create it
-            string createQuery = "CREATE TABLE Students (" +
-                "idStudent INT NOT NULL, " +
-                "lastName VARCHAR(45), " +
-                "firstName VARCHAR(45), " +
-                "residence VARCHAR(45), " +
-                "origin VARCHAR(45), " +
-                "email VARCHAR(45), " +
-                "drawable INT, " +
-                "birthDate DATE, " +
-                "birthPlace VARCHAR(45), " +
-                "VFCounter INT, " +
-                "disabled Tinyint, " +
-                "hasSpecialNeeds Tinyint, " +
-                "PRIMARY KEY(idStudent));";
-            using (DbConnection conn = Connect())
-            {
-                DbCommand cmd = conn.CreateCommand();
-                cmd.CommandText = createQuery;
-                cmd.ExecuteNonQuery(); //execute the command
             }
         }
     }

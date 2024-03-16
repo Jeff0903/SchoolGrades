@@ -26,7 +26,7 @@ namespace SchoolGrades_WPF
             currentStudent = Student;
             isDialog = IsDialog;
         }
-        private void frmStudent_Loaded(object sender, EventArgs e)
+        private void frmStudent_Load(object sender, EventArgs e)
         {
             if (currentStudent != null)
             {
@@ -132,35 +132,43 @@ namespace SchoolGrades_WPF
                 MessageBox.Show("Salvare o scegliere lo studente");
             }
         }
-        private void btnFindStudent_Click(object sender, RoutedEventArgs e)
+        private void btnFindStudent_Click(object sender, EventArgs e)
         {
             DataTable dt = Commons.bl.FindStudentsLike(txtLastName.Text, txtFirstName.Text);
-            dgwSearchedStudents.ItemsSource = dt.AsDataView();
+            dgwSearchedStudents.ItemsSource = (System.Collections.IEnumerable)dt;
         }
-        private void btnFindHomonyms_Click(object sender, EventArgs e)
+
+        private void btnFindHomonym_Click(object sender, EventArgs e)
         {
             DataTable dt = Commons.bl.GetStudentsSameName(txtLastName.Text, txtFirstName.Text);
-            dgwSearchedStudents.ItemsSource = dt.AsDataView();
+            dgwSearchedStudents.ItemsSource = (System.Collections.IEnumerable)dt;
         }
-        private void dgwSearchedStudents_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+
+        private void dgwSearchedStudents_CellClick(object sender, RoutedEvent e)
         {
             DataGrid grid = (DataGrid)sender;
             int RowIndex = grid.SelectedIndex;
             if (RowIndex > -1)
             {
-                int key = (int)((DataTable)dgwSearchedStudents.ItemsSource).Rows[RowIndex]["idStudent"];
+                int key = (int)((DataTable)(dgwSearchedStudents.ItemsSource)).Rows[RowIndex]["idStudent"];
                 Student s = Commons.bl.GetStudent(key);
                 loadStudentData(s);
                 currentStudent = s;
             }
         }
-        private void dgwSearchedStudents_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+
+        private void dgwSearchedStudents_CellContentClick(object sender, RoutedEvent e)
+        {
+
+        }
+
+        private void dgwSearchedStudents_CellDoubleClick(object sender, RoutedEvent e)
         {
             DataGrid grid = (DataGrid)sender;
             int RowIndex = grid.SelectedIndex;
             if (RowIndex > -1)
             {
-                int key = (int)((DataTable)dgwSearchedStudents.ItemsSource).Rows[RowIndex]["idStudent"];
+                int key = (int)((DataTable)(dgwSearchedStudents.ItemsSource)).Rows[RowIndex]["idStudent"];
                 Student s = Commons.bl.GetStudent(key);
                 loadStudentData(s);
                 currentStudent = s;
@@ -170,11 +178,13 @@ namespace SchoolGrades_WPF
         //{
         //    UserHasChosen = false;
         //}
-        private void btnExitWithoutChoosing_Click(object sender, RoutedEventArgs e)
+
+        private void btnExitWithoutChoosing_Click(object sender, EventArgs e)
         {
             UserHasChosen = false;
             this.Close();
         }
+
         private void btnDeleteStudent_Click(object sender, EventArgs e)
         {
             MessageBox.Show("DA FARE!!");

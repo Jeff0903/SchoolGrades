@@ -584,9 +584,5 @@ namespace SchoolGrades
                 cmd.Dispose();
             }
         }
-        internal override void CreateTableStudents()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -40,7 +40,7 @@ namespace gamon.TreeMptt
         // Business Logic Layer
         BusinessLayer bl;
         // class that encapsulates the data access to the tree nodes 
-        TreeMpttDb dbMptt;
+        TreeMpttDb_SqLite dbMptt;
 
         private bool hasChanges = false;
         bool markAllInSearch = false;
@@ -97,14 +97,14 @@ namespace gamon.TreeMptt
 
         // if true the backcolor of nodes will be cleared when the user clicks on one node 
         bool clearBackColorOnClick = true;
-        internal bool ClearBackColorOnClick { get => clearBackColorOnClick; set => clearBackColorOnClick = value; }
+        public bool ClearBackColorOnClick { get => clearBackColorOnClick; set => clearBackColorOnClick = value; }
         // Name of the object
-        internal string Name { get; set; }
+        public string Name { get; set; }
         // TreeView control from the calling code
-        internal TreeView TreeView { get => shownTreeView; }
+        public TreeView TreeView { get => shownTreeView; }
 
         bool functionKeysEnabled = true;
-        internal bool FunctionKeysEnabled
+        public bool FunctionKeysEnabled
         {
             get
             {
@@ -149,7 +149,7 @@ namespace gamon.TreeMptt
                 functionKeysEnabled = value;
             }
         }
-        internal bool HasChanges { get => hasChanges; set => hasChanges = value; }
+        public bool HasChanges { get => hasChanges; set => hasChanges = value; }
         internal TreeMptt(TreeView TreeViewControl,
             TextBox TxtNodeName, TextBox TxtNodeDescription, TextBox TxtNodeSearchString,
             TextBox TxtNodeDigest, TextBox TxtIdNode,
@@ -159,8 +159,11 @@ namespace gamon.TreeMptt
            )
         {
             bl = Commons.bl;
-            dbMptt = TreeMptt.SetDataLayer();
-
+#if SQL_SERVER
+            TreeMpttDb_SqlServer dbMptt = new();
+#else
+            TreeMpttDb_SqLite dbMptt = new TreeMpttDb_SqLite();
+#endif
             shownTreeView = TreeViewControl;
             //listTopicsBefore = InitialListOfTopics;
             txtNodeName = TxtNodeName;
@@ -193,14 +196,6 @@ namespace gamon.TreeMptt
                 txtNodeDescription.LostFocus += txtNodeDescription_LostFocus;
             }
             typeOfDragAndDrop = TypeOfDragAndDrop;
-        }
-        internal static TreeMpttDb SetDataLayer()
-        {
-#if SQL_SERVER
-            return new TreeMpttDb_SqlServer(Commons.bl.dl);
-#else
-            return new TreeMpttDb_SqLite(Commons.bl.dl);
-#endif
         }
         #region methods that save the tree
         internal void SaveTreeFromScratch()
@@ -445,7 +440,7 @@ namespace gamon.TreeMptt
                 (InitialNode.LeftNodeOld, InitialNode.RightNodeOld, false);
             return tree;
         }
-        internal void ImportSubtreeFromText(string TextFromClipboard)
+        public void ImportSubtreeFromText(string TextFromClipboard)
         {
             if (TextFromClipboard == "")
             {

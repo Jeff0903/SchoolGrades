@@ -30,9 +30,9 @@ namespace SchoolGrades
                 File.Delete(dbTest);
             File.Copy(dbStandard, dbTest);
         }
-        internal override void CreateTableGF()
-        {
-            throw new System.NotImplementedException();
-        }
+        internal override void CreateTableGF() { }
+        internal override void DeleteTableGF() { }
+        internal override void UpdateTableGF() { }
+        internal override void CreateGeneralFunctions() { }
     }
 }

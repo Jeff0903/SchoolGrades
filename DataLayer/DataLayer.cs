@@ -38,6 +38,9 @@ namespace SchoolGrades
         // GeneralFunctions
         internal abstract object ReadFirstRowFirstField(string Table);
         internal abstract void CreateTableGF();
+        internal abstract void CreateGeneralFunctions();
+        internal abstract void UpdateTableGF();
+        internal abstract void DeleteTableGF();
 
         // AnnotationsManagement
         internal abstract List<StudentAnnotation> AnnotationsAboutThisStudent(Student currentStudent,
